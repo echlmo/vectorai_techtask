@@ -1,12 +1,12 @@
-# A simple full-stack application
+# A simple full stack application
 
 **Using:**
 - Python 3.8
-- Flask
-- ...
+- React
+- PostgresQL
 
 ## How to use
 TBA
 
 ## Development notes
-For this simple full stack application using React, Python and PostgresQL I have chosen to start with a Flask framework as it is a simple framework which can accommodate the requirements of the app.
+For this simple application using React, Python and PostgresQL I started by implementing the basic framework for the React frontend.
