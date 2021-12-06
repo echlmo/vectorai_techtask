@@ -1,3 +1,5 @@
+// Based on tutorial at: https://github.com/tfiechowski/react-dnd-grid-tutorial
+
 import React, { useState, createContext } from "react";
 
 // Helper: Reorders an array when moving an item from one position to another
@@ -21,7 +23,34 @@ function moveItem(array, index, offset){
 const GridContext = createContext({ items: []});    //Init context for Grid (empty)
 
 export function GridMaker(props) {
-    const state = useState({items:[]});
+    const moveItems = (source, dest) => {
+        const sourcePos = state.items.findIndex(
+            i => i.id === source
+        );
+
+        const destinationPos = state.items.findIndex(
+            i => i.id === dest
+        );
+
+        if (source === -1 || dest === -1) {
+            return;
+        }
+
+        const offset = destinationPos - sourcePos;
+
+        setState(state => ({
+            items: moveItem(state.items, sourcePos, offset)
+        }));
+    };
+
+    const setItems = (items) => setState({items})
+
+    const [state, setState] = useState({
+        items: [],
+        moveItems: moveItems,
+        setItems: setItems
+    });
+
     return (
         <GridContext.Provider value={state}>
             {props.children}

@@ -1,4 +1,6 @@
-import React, { useRef } from 'react';
+// Based on tutorial at: https://github.com/tfiechowski/react-dnd-grid-tutorial
+
+import React from 'react';
 import styled from 'styled-components';
 
 export const Grid = styled.div `
