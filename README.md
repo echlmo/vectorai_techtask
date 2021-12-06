@@ -2,6 +2,7 @@
 
 **Using:**
 - Python 3.8
+  - Starlette
 - React
 - PostgresQL
 
@@ -11,6 +12,5 @@
 - Run `npm start` in the command line
 
 ## Development notes
-For this simple application using React, Python and PostgresQL I started by implementing the basic framework and design for the React frontend with 5 cards displaying content from the JSON and images.
-I aimed to approach the task and requirements sequentially by identifying the basic features being requested and how I would separate the various features and their functions.
+I first aimed to approach the task and requirements sequentially by identifying the basic features being requested and how I would separate the various features and their functions.
 As this is the first web project I have used React in, I was challenged to learn the new framework and its features as I went along. I found that while my prior experience of web development using HTML/CSS/JS and jQuery was useful in planning out the implementation, translating the implementation into React code added to the challenge.
