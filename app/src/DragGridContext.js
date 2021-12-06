@@ -1,6 +1,17 @@
 // Based on tutorial at: https://github.com/tfiechowski/react-dnd-grid-tutorial
 
 import React, { useState, createContext } from "react";
+import {dog, fiyah, friendlyguy, ok, sads} from "./img";
+import data from "./static/data.json";
+
+
+// Data and thumbnails for initializing
+const images = [dog, fiyah, friendlyguy, ok, sads];
+
+const cardData = data.map(i => (
+        i.src = images[data.indexOf(i)]
+    )
+)
 
 // Helper: Reorders an array when moving an item from one position to another
 function move(array, oldPos, newPos) {
@@ -43,10 +54,10 @@ export function GridMaker(props) {
         }));
     };
 
-    const setItems = (items) => setState({items})
+    const setItems = items => setState({items})
 
     const [state, setState] = useState({
-        items: [],
+        items: cardData,
         moveItems: moveItems,
         setItems: setItems
     });

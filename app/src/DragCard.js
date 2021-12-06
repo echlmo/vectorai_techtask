@@ -5,11 +5,11 @@ import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 // A custom Card component that can be dragged and dropped
-export default function DragCard( {id, onMoveItem, children} ) {
+function DragCard( {id, onMoveItem, children} ) {
     const ref = useRef(null); // Initialize ref for component
 
-    const [{isDrag}, connectDrag] = useDrag({
-        item: {id: id, type: "DRAG_CARD"},
+    const [{isDragging}, connectDrag] = useDrag({
+        item: {id, type: "DRAG_CARD"},
         collect: monitor => {
             return {
                 isDragging: monitor.isDragging()
@@ -29,7 +29,7 @@ export default function DragCard( {id, onMoveItem, children} ) {
     connectDrag(ref);
     connectDrop(ref);
 
-    const dragop = isDrag ? 0.5 : 1;
+    const dragop = isDragging ? 0.5 : 1;
 
     return (
         React.Children.map(children, child =>
@@ -40,3 +40,5 @@ export default function DragCard( {id, onMoveItem, children} ) {
         )
     )
 }
+
+export default DragCard;

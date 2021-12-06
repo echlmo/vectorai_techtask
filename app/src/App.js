@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useContext} from 'react';
 import './App.css';
 
 import { DndProvider } from 'react-dnd';
@@ -12,11 +12,11 @@ import ImageModal from './ImageModal';
 
 import {dog, fiyah, friendlyguy, ok, sads} from './img';
 
-import data from './static/content.json';
+import data from './static/data.json';
 
 function App() {
 
-    // The assigned thumbnails
+// Assign thumbnails to data from JSON
     const images = [dog, fiyah, friendlyguy, ok, sads];
 
     data.map(i => (
@@ -59,8 +59,8 @@ function App() {
             {/*<DndProvider backend={HTML5Backend}>*/}
             {/*    <GridMaker>*/}
             {/*        <Grid>*/}
-            {/*            {data.map(item => (*/}
-            {/*                <DragCard id={item.type} onMoveItem={moveItems}>*/}
+            {/*            {items.map(item => (*/}
+            {/*                <DragCard key={item.type} id={item.type} onMoveItem={moveItems} onClick={handleClick}>*/}
             {/*                    <GridCell>*/}
             {/*                        <h2>{item.title}</h2>*/}
             {/*                        <GridPic>*/}
