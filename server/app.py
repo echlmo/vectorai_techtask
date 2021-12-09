@@ -8,7 +8,6 @@ from starlette.exceptions import HTTPException
 from starlette.routing import Route
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
-from starlette.testclient import TestClient
 
 from config import DATABASE_URL
 from table import Profiles
@@ -84,7 +83,7 @@ class UserProfile(HTTPEndpoint):
         query = Profiles.select().where(
             Profiles.c.id == int(params['id'])
         )
-        result = await db.execute(query)
+        result = await db.fetch_one(query=query)
         content = [
             {
                 "id": result["id"],
@@ -124,7 +123,7 @@ class UserProfile(HTTPEndpoint):
 
 routes = [
     Route("/profiles", endpoint=AllProfiles, methods=["GET", "POST"]),
-    Route("/profiles/{id}", endpoint=UserProfile, methods=["GET", "PUT"])
+    Route("/profiles/{id}", endpoint=UserProfile, methods=["GET", "POST"])
 ]
 
 app = Starlette(
@@ -134,10 +133,6 @@ app = Starlette(
     on_startup=[db.connect],
     on_shutdown=[db.disconnect])
 
-client = TestClient(app)
-response = client.get('/profiles/2')
-print(response.content)
-assert response.status_code == 200
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True, log_level="info")
