@@ -3,7 +3,7 @@ import sqlalchemy
 metadata = sqlalchemy.MetaData()
 
 Profiles = sqlalchemy.Table(
-    "Profiles",
+    "profiles",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("position", sqlalchemy.Integer),

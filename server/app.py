@@ -8,6 +8,7 @@ from starlette.exceptions import HTTPException
 from starlette.routing import Route
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
+from starlette.testclient import TestClient
 
 from config import DATABASE_URL
 from table import Profiles
@@ -29,6 +30,7 @@ class AllProfiles(HTTPEndpoint):
         :return: JSONResponse
         """
 
+        await db.connect()
         query = Profiles.select().order_by("position")
         results = await db.fetch_all(query)
         content = [
@@ -36,7 +38,7 @@ class AllProfiles(HTTPEndpoint):
                 "id": result["id"],
                 "position": ["position"],
                 "title": result["title"],
-                "type": result["type"],
+                "type_name": result["type_name"],
                 "img_src": result["img_src"]
             }
             for result in results
@@ -77,6 +79,7 @@ class UserProfile(HTTPEndpoint):
         :return: JSONResponse
         """
 
+        await db.connect()
         params = request.path_params
         query = Profiles.select().where(
             Profiles.c.id == int(params['id'])
@@ -85,7 +88,7 @@ class UserProfile(HTTPEndpoint):
         content = [
             {
                 "id": result["id"],
-                "position": ["position"],
+                "position": result["position"],
                 "title": result["title"],
                 "type_name": result["type_name"],
                 "img_src": result["img_src"]
@@ -99,17 +102,17 @@ class UserProfile(HTTPEndpoint):
         Update an existing profile to database by ID.
         :param request: Request with path_params containing key:value pairs: 'id':(int) 'title':(str), 'type_name':(str)
         and 'position':(int). Optional params: 'img_src':(str)
-        :return: None.
+        :return: JSONResponse "success": "true"
         """
-        if request.method == "PUT":
+        if request.method == "POST":
             body = await request.json()
-            query = Profiles.insert.values(
+            query = Profiles.update.where(
+                Profiles.c.id == int(body['id'])
+            ).values(
                 img_src=body['img_src'],
                 position=body['position'],
                 title=body['title'],
                 type_name=body['type_name']
-            ).where(
-                Profiles.c.id == int(body['id'])
             )
             await db.execute(query)
             return JSONResponse({
@@ -130,6 +133,11 @@ app = Starlette(
     middleware=middleware,
     on_startup=[db.connect],
     on_shutdown=[db.disconnect])
+
+client = TestClient(app)
+response = client.get('/profiles/2')
+print(response.content)
+assert response.status_code == 200
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True, log_level="info")
