@@ -1,62 +1,135 @@
 import databases
+import uvicorn
+
 from starlette.applications import Starlette
-from starlette.responses import JSONResponse, Response
+from starlette.responses import JSONResponse
 from starlette.endpoints import HTTPEndpoint
+from starlette.exceptions import HTTPException
 from starlette.routing import Route
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 
 from config import DATABASE_URL
+from table import Profiles
 
 
 db = databases.Database(DATABASE_URL)
 
-
-async def get_profiles(request):
-    """
-    Get all profile from the database.
-    Returns profile data in position order.
-    """
-    pass
+middleware = [
+    Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=["GET", "POST", "PUT"])
+]
 
 
-async def get_profile(request):
-    """
-    Get a profile from the database by ID.
-    Returns profile data in position order.
-    """
-    pass
+class AllProfiles(HTTPEndpoint):
+    async def get(self, request):
+        """
+        Get all profiles from the database.
+        Returns profile data sorted in position order as JSON.
+        :param request: Request
+        :return: JSONResponse
+        """
+
+        query = Profiles.select().order_by("position")
+        results = await db.fetch_all(query)
+        content = [
+            {
+                "id": result["id"],
+                "position": ["position"],
+                "title": result["title"],
+                "type": result["type"],
+                "img_src": result["img_src"]
+            }
+            for result in results
+        ]
+
+        return JSONResponse(content)
+
+    async def post(self, request):
+        """
+        Add a new user profile to database.
+        :param request: Request with field 'params' containing key:value pairs: 'title':(str), 'type_name':(str)
+        and 'position':(int). Optional params: 'img_src':(str)
+        :return: JSONResponse "success": "true"
+        """
+
+        if request.method == "POST":
+            body = await request.json()
+            query = Profiles.insert.values(
+                img_src=body['img_src'],
+                position=body['position'],
+                title=body['title'],
+                type_name=body['type_name']
+            )
+            await db.execute(query)
+            return JSONResponse({
+                "success": "true"
+            })
+
+        raise HTTPException(status_code=400)
 
 
-async def add_profile(request):
-    """
-    Add a user profile to database.
-    """
-    pass
+class UserProfile(HTTPEndpoint):
+    async def get(self, request):
+        """
+        Get a profile from the database by ID.
+        Returns profile data as JSON.
+        :param request: Request with path_params containing key:value pair 'id':(int).
+        :return: JSONResponse
+        """
 
+        params = request.path_params
+        query = Profiles.select().where(
+            Profiles.c.id == int(params['id'])
+        )
+        result = await db.execute(query)
+        content = [
+            {
+                "id": result["id"],
+                "position": ["position"],
+                "title": result["title"],
+                "type_name": result["type_name"],
+                "img_src": result["img_src"]
+            }
+        ]
 
-async def get_picture(request):
-    """
-    Get picture source url for an existing user profile.
-    """
-    pass
+        return JSONResponse(content)
 
+    async def post(self, request):
+        """
+        Update an existing profile to database by ID.
+        :param request: Request with path_params containing key:value pairs: 'id':(int) 'title':(str), 'type_name':(str)
+        and 'position':(int). Optional params: 'img_src':(str)
+        :return: None.
+        """
+        if request.method == "PUT":
+            body = await request.json()
+            query = Profiles.insert.values(
+                img_src=body['img_src'],
+                position=body['position'],
+                title=body['title'],
+                type_name=body['type_name']
+            ).where(
+                Profiles.c.id == int(body['id'])
+            )
+            await db.execute(query)
+            return JSONResponse({
+                "success": "true"
+            })
 
-async def add_picture(request):
-    """
-    Add a picture to an existing user profile (id, img_src).
-    """
-    pass
+        raise HTTPException(status_code=400)
 
 
 routes = [
-    Route("/profiles", endpoint=get_profiles, methods=["GET"]),
-    Route("/profiles/{id}", endpoint=get_profile, methods=["GET"]),
-    Route("/profiles/update", endpoint=add_profile, methods=["POST"]),
-    Route("/pictures/{id}", endpoint=get_picture, methods=["GET"]),
-    Route("/pictures/update", endpoint=add_picture, methods=["POST"])
+    Route("/profiles", endpoint=AllProfiles, methods=["GET", "POST"]),
+    Route("/profiles/{id}", endpoint=UserProfile, methods=["GET", "PUT"])
 ]
 
 app = Starlette(
     debug=True,
     routes=routes,
+    middleware=middleware,
     on_startup=[db.connect],
     on_shutdown=[db.disconnect])
+
+if __name__ == "__main__":
+    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True, log_level="info")
