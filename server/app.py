@@ -16,7 +16,7 @@ from table import Profiles
 db = databases.Database(DATABASE_URL)
 
 middleware = [
-    Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=["GET", "POST", "PUT"])
+    Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=["GET", "POST"])
 ]
 
 
@@ -36,8 +36,8 @@ class AllProfiles(HTTPEndpoint):
             {
                 "id": result["id"],
                 "position": ["position"],
-                "title": result["title"],
                 "type_name": result["type_name"],
+                "title": result["title"],
                 "img_src": result["img_src"]
             }
             for result in results
@@ -56,10 +56,10 @@ class AllProfiles(HTTPEndpoint):
         if request.method == "POST":
             body = await request.json()
             query = Profiles.insert.values(
-                img_src=body['img_src'],
                 position=body['position'],
+                type_name=body['type_name'],
                 title=body['title'],
-                type_name=body['type_name']
+                img_src=body['img_src']
             )
             await db.execute(query)
             return JSONResponse({
@@ -88,8 +88,8 @@ class UserProfile(HTTPEndpoint):
             {
                 "id": result["id"],
                 "position": result["position"],
-                "title": result["title"],
                 "type_name": result["type_name"],
+                "title": result["title"],
                 "img_src": result["img_src"]
             }
         ]
@@ -99,19 +99,20 @@ class UserProfile(HTTPEndpoint):
     async def post(self, request):
         """
         Update an existing profile to database by ID.
-        :param request: Request with path_params containing key:value pairs: 'id':(int) 'title':(str), 'type_name':(str)
+        :param request: Request with path_params containing key:value pairs: 'title':(str), 'type_name':(str)
         and 'position':(int). Optional params: 'img_src':(str)
         :return: JSONResponse "success": "true"
         """
         if request.method == "POST":
             body = await request.json()
+            params = request.path_params
             query = Profiles.update.where(
-                Profiles.c.id == int(body['id'])
+                Profiles.c.id == int(params['id'])
             ).values(
-                img_src=body['img_src'],
                 position=body['position'],
+                type_name=body['type_name'],
                 title=body['title'],
-                type_name=body['type_name']
+                img_src=body['img_src']
             )
             await db.execute(query)
             return JSONResponse({

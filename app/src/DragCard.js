@@ -1,11 +1,11 @@
 // Based on tutorial at: https://github.com/tfiechowski/react-dnd-grid-tutorial
 
-import React, { useRef } from 'react';
+import React, { useRef, memo} from 'react';
 
 import { useDrag, useDrop } from 'react-dnd';
 
 // A custom Card component that can be dragged and dropped
-function DragCard( {id, onMoveItem, children} ) {
+const DragCard = memo( ({id, onMoveItem, children}) => {
     const ref = useRef(null); // Initialize ref for component
 
     const [{isDragging}, connectDrag] = useDrag({
@@ -38,7 +38,7 @@ function DragCard( {id, onMoveItem, children} ) {
                 style: {dragop}
             })
         )
-    )
-}
+    );
+});
 
 export default DragCard;

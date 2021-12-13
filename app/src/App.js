@@ -9,15 +9,32 @@ import { Grid, GridCell, GridPic } from './DragGrid';
 import GridContext, {GridMaker} from './DragGridContext';
 import Picture from './Picture';
 import ImageModal from './ImageModal';
+import {useFetch} from "./useFetch";
 
 import {dog, fiyah, friendlyguy, ok, sads} from './img';
 
 import data from './static/data.json';
 
+/*
+TODO
+    - Fix: Get DnD cards working properly
+    - Call get from API for card data (title, position, img_src)
+    - Post to API for updating positions every move (x5 indiv posts)
+    - Fn to check every 5 seconds for change and update/reload data
+*/
+
 function App() {
 
-// Assign thumbnails to data from JSON
+    // Assign thumbnails to data from JSON
     const images = [dog, fiyah, friendlyguy, ok, sads];
+
+    const url = "http://0.0.0.0:8000";  // URL of REST API
+    const headers = {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+    }
+    const options = {};
+    const [request_data, error, isLoading] = useFetch(url, options);
 
     data.map(i => (
             i.src = images[data.indexOf(i)]
@@ -32,7 +49,7 @@ function App() {
         setModalImage("");
     }
 
-    const {items, moveItems} = useContext(GridContext);
+    const {items, moveItem} = useContext(GridContext);
 
     const handleClick = (e) => {
         setModalImage(e.currentTarget.querySelector("img").src);
@@ -57,10 +74,10 @@ function App() {
                 ))}
             </Grid>
             {/*<DndProvider backend={HTML5Backend}>*/}
-            {/*    <GridMaker>*/}
+            {/*    <GridMaker items={data}>*/}
             {/*        <Grid>*/}
             {/*            {items.map(item => (*/}
-            {/*                <DragCard key={item.type} id={item.type} onMoveItem={moveItems} onClick={handleClick}>*/}
+            {/*                <DragCard key={item.type} id={item.type} onMoveItem={moveItem} onClick={handleClick}>*/}
             {/*                    <GridCell>*/}
             {/*                        <h2>{item.title}</h2>*/}
             {/*                        <GridPic>*/}

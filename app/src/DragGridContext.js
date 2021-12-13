@@ -1,17 +1,6 @@
 // Based on tutorial at: https://github.com/tfiechowski/react-dnd-grid-tutorial
 
 import React, { useState, createContext } from "react";
-import {dog, fiyah, friendlyguy, ok, sads} from "./img";
-import data from "./static/data.json";
-
-
-// Data and thumbnails for initializing
-const images = [dog, fiyah, friendlyguy, ok, sads];
-
-const cardData = data.map(i => (
-        i.src = images[data.indexOf(i)]
-    )
-)
 
 // Helper: Reorders an array when moving an item from one position to another
 function move(array, oldPos, newPos) {
@@ -25,16 +14,20 @@ function move(array, oldPos, newPos) {
 }
 
 // Helper: Moves and repositions an item in an array by an offset using move()
-function moveItem(array, index, offset){
+function moveObject(array, index, offset){
     const newPos = index + offset;
 
     return move(array, index, newPos);
 }
 
-const GridContext = createContext({ items: []});    //Init context for Grid (empty)
+const GridContext = createContext({items: []});    //Init context for Grid (empty)
 
 export function GridMaker(props) {
-    const moveItems = (source, dest) => {
+    const [state, setState] = useState({
+        items: props.items
+    });
+
+    const moveItem = (source, dest) => {
         const sourcePos = state.items.findIndex(
             i => i.id === source
         );
@@ -50,17 +43,9 @@ export function GridMaker(props) {
         const offset = destinationPos - sourcePos;
 
         setState(state => ({
-            items: moveItem(state.items, sourcePos, offset)
+            items: moveObject(state.items, sourcePos, offset)
         }));
     };
-
-    const setItems = items => setState({items})
-
-    const [state, setState] = useState({
-        items: cardData,
-        moveItems: moveItems,
-        setItems: setItems
-    });
 
     return (
         <GridContext.Provider value={state}>
