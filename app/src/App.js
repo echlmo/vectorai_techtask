@@ -9,7 +9,8 @@ import { Grid, GridCell, GridPic } from './DragGrid';
 import GridContext, {GridMaker} from './DragGridContext';
 import Picture from './Picture';
 import ImageModal from './ImageModal';
-import {useFetch} from "./useFetch";
+import {useGet} from "./useGet";
+import {usePost} from "./usePost";
 
 import {dog, fiyah, friendlyguy, ok, sads} from './img';
 
@@ -25,22 +26,25 @@ TODO
 
 function App() {
 
-    // Assign thumbnails to data from JSON
+    // Mockup: Assign thumbnails to data from JSON
     const images = [dog, fiyah, friendlyguy, ok, sads];
-
-    const url = "http://0.0.0.0:8000";  // URL of REST API
-    const headers = {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-    }
-    const options = {};
-    const [request_data, error, isLoading] = useFetch(url, options);
 
     data.map(i => (
             i.src = images[data.indexOf(i)]
         )
     )
 
+    // REST API data
+    const url = `${process.env.API_ROOT}/profiles`;  // URL of REST API
+    const headers = {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+    }
+    const [body, setBody] = useState(null);
+    const [requestData, error, isLoading] = useGet(url, {headers: headers});
+    const [response, err, isPostLoading] = usePost(url, {headers: headers, body: body});
+
+    // Modal control
     const [modalImage, setModalImage] = useState("");    // The current image to display in the modal
     const [display, setDisplay] = useState(false);  // Modal visibility
 
@@ -49,13 +53,14 @@ function App() {
         setModalImage("");
     }
 
-    const {items, moveItem} = useContext(GridContext);
-
     const handleClick = (e) => {
         setModalImage(e.currentTarget.querySelector("img").src);
         setDisplay(true);
         console.log("Clicked ", e.currentTarget)
     }
+
+    // DnD Grid control context
+    const {items, moveItem} = useContext(GridContext);
 
     return (
         <div className="App">
