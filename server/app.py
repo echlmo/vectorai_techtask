@@ -7,6 +7,7 @@ from starlette.endpoints import HTTPEndpoint
 from starlette.exceptions import HTTPException
 from starlette.routing import Route
 from starlette.middleware import Middleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 from config import DATABASE_URL
@@ -16,7 +17,8 @@ from table import Profiles
 db = databases.Database(DATABASE_URL)
 
 middleware = [
-    Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=["GET", "POST"])
+    Middleware(CORSMiddleware, allow_origins=['*'], allow_headers=['*'], allow_methods=["GET", "POST"]),
+    Middleware(TrustedHostMiddleware, allowed_hosts=['*'])
 ]
 
 
@@ -136,4 +138,4 @@ app = Starlette(
 
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True, log_level="info")
+    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True, log_level="info")

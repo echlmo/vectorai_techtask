@@ -5,10 +5,10 @@ import React, { useRef, memo} from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 // A custom Card component that can be dragged and dropped
-const DragCard = memo( ({id, onMoveItem, children}) => {
+const DragCard = memo( ({ id, onMoveItem, children }) => {
     const ref = useRef(null); // Initialize ref for component
 
-    const [{isDragging}, connectDrag] = useDrag({
+    const [{ isDragging }, connectDrag] = useDrag({
         item: {id, type: "DRAG_CARD"},
         collect: monitor => {
             return {

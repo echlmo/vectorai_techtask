@@ -5,7 +5,7 @@ from pathlib import Path
 from starlette.config import Config
 
 
-config = Config('.env')
+config = Config('../.env')
 
 DATABASE_URL = config(
     'DATABASE_URL',

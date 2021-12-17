@@ -30,19 +30,20 @@ function App() {
     const images = [dog, fiyah, friendlyguy, ok, sads];
 
     data.map(i => (
-            i.src = images[data.indexOf(i)]
+            i.img_src = images[data.indexOf(i)]
         )
     )
 
     // REST API data
-    const url = `${process.env.API_ROOT}/profiles`;  // URL of REST API
+    const url = "http://127.0.0.1:8000/profiles"; //`${process.env.REACT_APP_API_ROOT}/profiles`;  // URL of REST API
     const headers = {
+        'Access-Control-Allow-Origin': '*',
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json'
     }
     const [body, setBody] = useState(null);
-    const [requestData, error, isLoading] = useGet(url, {headers: headers});
-    const [response, err, isPostLoading] = usePost(url, {headers: headers, body: body});
+    const {requestData, error, isLoading} = useGet(url, {headers: headers});
+    const {response, err, isPostLoading} = usePost(url, {headers: headers});
 
     // Modal control
     const [modalImage, setModalImage] = useState("");    // The current image to display in the modal
@@ -64,36 +65,37 @@ function App() {
 
     return (
         <div className="App">
-            {display && (
-                <div className="modal-display-block">
-                    <ImageModal src={modalImage} onClose={closeModal}/>
-                </div>
-            )}
-            <h1>Hello</h1>
-            <Grid>
-                {data.map( item => (
-                    <div className="card" onClick={handleClick}>
-                        <h2>{item.title}</h2>
-                        <Picture id={item.type} src={item.src} alt=""/>
+            <DndProvider backend={HTML5Backend}>
+                {display && (
+                    <div className="modal-display-block">
+                        <ImageModal src={modalImage} onClose={closeModal}/>
                     </div>
-                ))}
-            </Grid>
-            {/*<DndProvider backend={HTML5Backend}>*/}
-            {/*    <GridMaker items={data}>*/}
-            {/*        <Grid>*/}
-            {/*            {items.map(item => (*/}
-            {/*                <DragCard key={item.type} id={item.type} onMoveItem={moveItem} onClick={handleClick}>*/}
-            {/*                    <GridCell>*/}
-            {/*                        <h2>{item.title}</h2>*/}
-            {/*                        <GridPic>*/}
-            {/*                            <Picture src={item.src}/>*/}
-            {/*                        </GridPic>*/}
-            {/*                    </GridCell>*/}
-            {/*                </DragCard>*/}
-            {/*            ))}*/}
-            {/*        </Grid>*/}
-            {/*    </GridMaker>*/}
-            {/* </DndProvider>*/}
+                )}
+                <h1>Hello</h1>
+                {/*<p>{requestData}</p>*/}
+                <Grid>
+                    {requestData.map( item => (
+                        <div className="card" onClick={handleClick}>
+                            <h2>{item.title}</h2>
+                            <Picture id={item.type} src={item.img_src} alt=""/>
+                        </div>
+                    ))}
+                </Grid>
+             {/*   <GridMaker items={data}>*/}
+             {/*       <Grid>*/}
+             {/*           {items.map(item => (*/}
+             {/*               <DragCard key={item.type} id={item.type} onMoveItem={moveItem} onClick={handleClick}>*/}
+             {/*                   <GridCell>*/}
+             {/*                       <h2>{item.title}</h2>*/}
+             {/*                       <GridPic>*/}
+             {/*                           <Picture src={item.src}/>*/}
+             {/*                       </GridPic>*/}
+             {/*                   </GridCell>*/}
+             {/*               </DragCard>*/}
+             {/*           ))}*/}
+             {/*       </Grid>*/}
+             {/*   </GridMaker>*/}
+             </DndProvider>
         </div>
     );
 }
